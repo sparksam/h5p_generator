@@ -12,4 +12,4 @@ This project is used to to generate h5p archives based on contents from [h5p.com
 - @sparksam 🦁
 
 ## Libraries used: 
-- [h5p-standalone(https://github.com/tunapanda/h5p-standalone) by  @tunapanda
+- [h5p-standalone](https://github.com/tunapanda/h5p-standalone) by  @tunapanda
