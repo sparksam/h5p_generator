@@ -30,7 +30,7 @@ def load_question(connection, table_name: str, fields: list, exercise_id: int) -
 def load_stem_question(connection, exercise_id: id) -> list[Stem]:
     questions = load_question(connection=connection, table_name="questions", fields=[
                               'stimulus', 'answer_order_matters', 'sort_position'], exercise_id=exercise_id)
-    print(questions)
+    # print(questions)
     stems = load_question(connection=connection, table_name="stems", fields=[
         'id', 'content', 'created_at', 'updated_at'], exercise_id=exercise_id)
     return [Stem(id=x[0], content=x[1], created=x[2], updated=x[3], stimulus=y[0], answer_order_matters=y[1], sort_position=y[2]) for x, y in zip(stems, questions)]
@@ -44,6 +44,13 @@ def init():
                 k, v = [s.strip() for s in line.split('=')]
                 os.environ[k] = v
 
+
+# TODO
+# - Generate metadata files for the questions
+# - Generate the H5P files from the database
+# -
+
+# Generate for different type of questions.
 
 if __name__ == "__main__":
     init()

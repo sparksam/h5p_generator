@@ -1,5 +1,6 @@
 import json
 
+
 class PublicationGroup:
     def __init__(self) -> None:
         self.id
@@ -33,7 +34,15 @@ class Exercise:
         self.questions = questions
 
 
-class Question:
+class H5PExercise:
+    def generate_metadata_file(self):
+        pass
+
+    def generate_h5p(self):
+        pass
+
+
+class Question(H5PExercise):
     def __init__(self, id, stimulus, created, updated, answer_order_matters, sort_position) -> None:
         self.id = id
         self.stimilus = stimulus
@@ -41,7 +50,7 @@ class Question:
         self.updated = updated
         self.answer_order_matters = answer_order_matters
         self.sort_position = sort_position
-        self.answers = []
+        self.answers = list()
 
 
 class Answer:
@@ -56,10 +65,11 @@ class Answer:
 class Stem(Question):
     def __init__(self, id, content, stimulus, created, updated, answer_order_matters, sort_position) -> None:
         Question.__init__(self, id, stimulus, created,
-                                       updated, answer_order_matters, sort_position)
+                          updated, answer_order_matters, sort_position)
         self.content = content
+
     def __str__(self) -> str:
-        return json.dumps(self.__dict__,indent=4, sort_keys=False, default=str)
+        return json.dumps(self.__dict__, indent=4, sort_keys=False, default=str)
 
 
 class StemAnswer(Answer):
