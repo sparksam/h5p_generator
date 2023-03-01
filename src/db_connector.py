@@ -31,6 +31,10 @@ def load_question(connection, table_name: str, fields: list, exercise_id: int) -
     return execute_query(connection=connection, query=query)
 
 
+def load_stem(connection, table_name: str, fields: list, exercise_id: int) -> list[tuple]:
+    query = f""" SELECT {','.join(fields) if len(fields)>0 else '*'} from {table_name} where question_id in (SELECT id from questions where exercise_id={exercise_id}); """
+    return execute_query(connection=connection, query=query)
+
 def load_answers(connection,  fields: list, question_id: id) -> list[tuple]:
     query = f""" SELECT {','.join(fields) if len(fields)>0 else '*'} from  answers where question_id={question_id}; """
     return execute_query(connection=connection, query=query)
@@ -46,7 +50,7 @@ def load_stem_question(connection, config, exercise_id: id) -> list[Stem]:
     results = list()
     questions = load_question(connection=connection, table_name="questions", fields=[
                               'stimulus', 'answer_order_matters', 'sort_position'], exercise_id=exercise_id)
-    stems = load_question(connection=connection, table_name="stems", fields=[
+    stems = load_stem(connection=connection, table_name="stems", fields=[
         'id', 'content', 'created_at', 'updated_at'], exercise_id=exercise_id)
     for q, s in zip(questions, stems):
         stem_answers = load_stem_answers(connection=connection, fields=[
@@ -76,7 +80,11 @@ def init():
 # - Generate metadata files for the questions
 # - Generate the H5P files from the database
 # -
-# Generate for different type of questions.
+# - Generate for different type of questions.
+
+# - Add Publications and publication groups
+# - Consider the styles to generate the H5P files and type of questions. 
+# - Solve the N/A problem for some answers
 
 if __name__ == "__main__":
     init()
@@ -90,6 +98,7 @@ if __name__ == "__main__":
     # all_tables = list_all_tables(connection=connection)
 
     # print (all_tables)
+
     ids = load_exercises_ids(connection=connection, Limit=1000)
     for i in ids:
         stems = [x for x in load_stem_question(
