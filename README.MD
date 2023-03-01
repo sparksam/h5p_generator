@@ -13,3 +13,7 @@ This project is used to to generate h5p archives based on contents from [h5p.com
 
 ## Libraries used: 
 - [h5p-standalone](https://github.com/tunapanda/h5p-standalone) by  @tunapanda
+
+## To Solve
+- How do we store the h5p files? ( Github, Postgres, S3)
+- JSON or XML Format for storing? 
