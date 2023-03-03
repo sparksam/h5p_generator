@@ -10,30 +10,46 @@ FREE_RESPONSE = 'free-response'
 TRUE_FALSE = 'true-false'
 
 
-class PublicationGroup:
-    def __init__(self) -> None:
-        self.id
-        self.uuid
-        self.type
-        self.number
+class Serializable:
+    
+
+    def json_skip(self):
+        return []
+    
+    def __str__(self) -> str:
+        obj = self.__dict__.copy()
+        for path in self.json_skip():
+            path = path.split('/')
+            del reduce(op.getitem, path[:-1], obj)[path[-1]]
+        return json.dumps(obj, indent=4, sort_keys=False, default=lambda o: o.__dict__ if isinstance(o, Answer) else str(o))
 
 
-class Publication:
-    def __init__(self) -> None:
-        self.id
-        self.uuid
-        self.type
-        self.version
-        self.license
-        self.created
-        self.updated
-        self.publication_group
-        self.nickname
-        self.public_solutions
+class PublicationGroup(Serializable):
+    def __init__(self, id, uuid, type, number, is_solution_public, nickname) -> None:
+        self.id = id
+        self.uuid = uuid
+        self.type = type
+        self.number = number
+        self.is_solution_public = is_solution_public
+        self.nickname = nickname
 
 
-class Exercise:
-    def __init__(self, id, title, stimulus, created, updated, context, questions) -> None:
+class Publication(Serializable):
+    def __init__(self, id, uuid, type, version, license, created, updated, publication_group) -> None:
+        self.publication_id = id
+        self.uuid = uuid
+        self.type = type
+        self.version = version
+        self.license = license
+        self.created = created
+        self.updated = updated
+        self.publication_group = publication_group
+
+
+class Exercise(Publication):
+    def __init__(self, id, title, stimulus, created, updated, context, questions, publication_id, uuid, type, version, license, publication_group) -> None:
+        Publication.__init__(self, publication_id, uuid, type, version, license,
+                             created, updated, publication_group)
         self.id = id
         self.title = title
         self.stimulus = stimulus
@@ -43,21 +59,22 @@ class Exercise:
         self.questions = questions
 
 
-class H5PExercise:
-    def __init__(self, config: any = None) -> None:
+class Style():
+    def __init__(self, id, type, created, updated) -> None:
+        self.id = id
+        self.type = type
+        self.created = created
+        self.updated = updated
+
+
+class H5PExercise(Serializable):
+    def __init__(self, config) -> None:
         assert config is not None
         self.config = config
 
     def json_skip(self):
         return ["config"]
-
-    def __str__(self) -> str:
-        obj = self.__dict__.copy()
-        for path in self.json_skip():
-            path = path.split('/')
-            del reduce(op.getitem, path[:-1], obj)[path[-1]]
-        return json.dumps(obj, indent=4, sort_keys=False, default=lambda o: o.__dict__ if isinstance(o, Answer) else str(o))
-
+    
     def generate_config_from_key(self, yaml_config_prefix: str):
         config_path = yaml_config_prefix.split('.')
         dialog_config = reduce(
@@ -113,7 +130,7 @@ class H5PExercise:
 
 
 class Question(H5PExercise):
-    def __init__(self, config: any, id, stimulus, created, updated, answer_order_matters, sort_position, answers) -> None:
+    def __init__(self, config, id, stimulus, created, updated, answer_order_matters, sort_position, answers, styles) -> None:
         H5PExercise.__init__(self, config)
         self.id = id
         self.stimilus = stimulus
@@ -122,13 +139,14 @@ class Question(H5PExercise):
         self.answer_order_matters = answer_order_matters
         self.sort_position = sort_position
         self.answers = answers if answers is not None else list()
+        self.styles = styles if styles is not None else list()
 
     def question_type(self):
         if len(self.answers) >= 2:
             return MULTIPLE_CHOICE
 
 
-class Answer:
+class Answer(Serializable):
     def __init__(self, id, content, created, updated, sort_position) -> None:
         self.id = id
         self.content = content
