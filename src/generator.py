@@ -65,6 +65,7 @@ if __name__ == '__main__':
     logging.root.setLevel(logging.DEBUG)
     source_dir = "templates"
     filename = "H5P.MultiChoice.h5p"
+    # filename = "H5P.TrueFalse.h5p"
     launch_web_server(source_dir=source_dir, filename=filename)
     # temporary_dir = create_temporary_dir()
     # logging.info(f"Temporary Folder: {temporary_dir}")
